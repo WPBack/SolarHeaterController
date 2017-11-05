@@ -52,9 +52,11 @@ void loop() {
   // Read the temperature every 10 seconds
   if (millis() - readMillis > 10000) {
     lastTemp = max.temperature(NOMREF, RREF);
+    readMillis = millis();
+    Serial.println(lastTemp);
   }
 }
 
 void sendData() {
-    Wire.write((int)lastTemp);
+    Wire.write((int)(lastTemp*100));
   }
