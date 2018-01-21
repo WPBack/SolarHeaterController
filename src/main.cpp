@@ -1,62 +1,88 @@
-/***************************************************
-  This is a library for the Adafruit PT100/P1000 RTD Sensor w/MAX31865
-
-  Designed specifically to work with the Adafruit RTD Sensor
-  ----> https://www.adafruit.com/products/3328
-
-  This sensor uses SPI to communicate, 4 pins are required to
-  interface
-  Adafruit invests time and resources providing this open source code,
-  please support Adafruit and open-source hardware by purchasing
-  products from Adafruit!
-
-  Written by Limor Fried/Ladyada for Adafruit Industries.
-  BSD license, all text above must be included in any redistribution
- ****************************************************/
-
 #include <Arduino.h>
 #include <SPI.h>
 #include <Adafruit_MAX31865.h>
 #include <Wire.h>
 
-// Use software SPI: CS, DI, DO, CLK
-Adafruit_MAX31865 max = Adafruit_MAX31865(10);
-// use hardware SPI, just pass in the CS pin
-//Adafruit_MAX31865 max = Adafruit_MAX31865(10);
+// Debug-mode
+#define DEBUG
 
-//Variable to hold the temperature
-double lastTemp = 0;
+// Pin-defines
+#define TANK_CS   10  //Tank chip select pin
+#define PANEL_CS  11  //Panel chip select pin
 
-//Variable to hold the last time it was reading the temperature
-unsigned long readMillis = 0;
-
-// The value of the Rref resistor. Use 430.0!
+// MAX31865 sensor settings
 #define RREF 4300.0
 #define NOMREF 1000
+
+// I2C settings
 #define SLAVE_ADDRESS 0x04
 
+// Settings for how often the stuff should run
+#define READ_TEMPS_TIME 10000
+
+// MAX31865 sensors
+Adafruit_MAX31865 tankSensor = Adafruit_MAX31865(TANK_CS);
+Adafruit_MAX31865 panelSensor = Adafruit_MAX31865(PANEL_CS);
+
+//Variables to hold the temperatures
+double tankTemp = 0;
+double panelTemp = 0;
+
+//Variable to hold the last time it was reading the temperature
+unsigned long readTempMillis = 0;
+
+// Arrays to hold the data that should be transfered over I2C
+char tankI2C[6];
+char panelI2C[6];
+
+// Method to send the data to the raspberry for datalogging
 void sendData();
 
+
 void setup() {
-  Serial.begin(115200);
-  Serial.println("Adafruit MAX31865 PT100 Sensor Test!");
+  // Serial for debug if enabled
+  #ifdef DEBUG
+    Serial.begin(115200);
+    Serial.println("Program started!");
+  #endif
 
-  max.begin(MAX31865_2WIRE);  // set to 2WIRE or 4WIRE as necessary
+  // Setting up the temp sensors
+  tankSensor.begin(MAX31865_2WIRE);
+  panelSensor.begin(MAX31865_2WIRE);
+
+  // Setting up the I2C-bus
   Wire.begin(SLAVE_ADDRESS);
-
   Wire.onRequest(sendData);
 }
 
 
 void loop() {
+
   // Read the temperature every 10 seconds
-  if (millis() - readMillis > 10000) {
-    lastTemp = max.temperature(NOMREF, RREF);
-    readMillis = millis();
-    Serial.println(lastTemp);
+  if (millis() - readTempMillis > READ_TEMPS_TIME) {
+    // Read the temps
+    tankTemp = tankSensor.temperature(NOMREF, RREF);
+    panelTemp = tankSensor.temperature(NOMREF, RREF);
+
+    // Saves the temps in char arrays to send over I2C
+    dtostrf(tankTemp, 6, 2, tankI2C);
+    dtostrf(panelTemp, 6, 2, panelI2C);
+
+    // Saves the time
+    readTempMillis = millis();
+
+    // Prints to serial if debug is enabled
+    #ifdef DEBUG
+      Serial.print("Tank: ");
+      Serial.print(tankTemp);
+      Serial.print(" Panel: ");
+      Serial.println(panelTemp);
+    #endif
   }
 }
 
 void sendData() {
-    Wire.write((int)(lastTemp*100));
+    // Write the temperatures to I2C
+    Wire.write(tankI2C);
+    Wire.write(panelI2C);
   }
