@@ -13,10 +13,10 @@ Adafruit_MAX31865 tankSensor = Adafruit_MAX31865(TANK_CS);
 Adafruit_MAX31865 panelSensor = Adafruit_MAX31865(PANEL_CS);
 
 // PID for the pump speed
-double setpoint = SETPOINT;
-double input = 0;
-double output = 0;
-PID pumpPID(&setpoint, &output, &input, kP, kI, kD, DIRECT);
+double pidSetpoint = SETPOINT;
+double pidInput = 0;
+double pidOutput = 0;
+PID pumpPID(&pidSetpoint, &pidOutput, &pidInput, kP, kI, kD, DIRECT);
 
 //Variables to hold the temperatures
 double tankTemp = 0;
@@ -29,6 +29,7 @@ unsigned long pidMillis = 0;
 // Arrays to hold the data that should be transfered over I2C
 char tankI2C[6];
 char panelI2C[6];
+char pumpI2C[6];
 
 // Method to send the data to the raspberry for datalogging
 void sendData();
@@ -51,7 +52,7 @@ void setup() {
 
   // Setup the PID
   pumpPID.SetMode(AUTOMATIC);
-  pumpPID.SetOutputLimits(PID_MIN, PID_MAX);
+  pumpPID.SetOutputLimits(PWM_MIN, PWM_MAX);
 
   // Setup the pump-pin
   pinMode(PUMP_PIN, OUTPUT);
@@ -90,16 +91,18 @@ void loop() {
     pidMillis = millis();
 
     // Calculates the difference
-    input = panelTemp - tankTemp;
+    pidInput = panelTemp - tankTemp;
 
     // Runs the PID
     pumpPID.Compute();
 
-    // Writes the speed to the pin that controls the pump
-    analogWrite(PUMP_PIN, output*2.55);
+    // Writes the speed to the pin that controls the pump and saves it for I2C
+    analogWrite(PUMP_PIN, pidOutput*2.55);
+    dtostrf(pidOutput, 6, 2, pumpI2C);
   }
 }
 
+// Writes data to I2C for logging
 void sendData() {
     // Write the temperatures to I2C
     Wire.write(tankI2C);
