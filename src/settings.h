@@ -1,6 +1,6 @@
 // Tuning parameters for the PID-controller
 #define kP 5
-#define kI 1
+#define kI 0.1
 #define kD 0
 
 // General settins
@@ -24,4 +24,5 @@
 
 // Settings for how often the stuff should run
 #define READ_TEMPS_TIME 5000
-#define PID_TIME 5000
+#define STATE_TIME 1000
+#define PID_TIME 1000

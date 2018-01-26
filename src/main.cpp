@@ -33,6 +33,13 @@ char tankI2C[6];
 char panelI2C[6];
 char pumpI2C[6];
 
+// Enum to hold the state
+enum State {
+  waiting,
+  priming,
+  running
+};
+
 //-------------- Help-methods --------------------------------------------------
 
 void sendData();
