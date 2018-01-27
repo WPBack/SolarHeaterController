@@ -11,9 +11,10 @@
 #define PWM_MAX   100 //Maximum pump speed
 
 // Pin-settings
-#define TANK_CS   10  //Tank chip select pin
-#define PANEL_CS  11  //Panel chip select pin
-#define PUMP_PIN  3   //Pump PWM pin
+#define TANK_CS         10  //Tank chip select pin
+#define PANEL_CS        9   //Panel chip select pin
+#define PUMP_PIN        3   //Pump PWM pin
+#define PUMP_ENABLE_PIN 2   //Pin for the pump relay
 
 // MAX31865 sensor settings
 #define RREF 4300.0
