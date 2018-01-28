@@ -19,23 +19,28 @@ class myPID {
     void setDeadBand(double, double);
 
   private:
-    double* input;
-    double* output;
-    double* setpoint;
+    double* _input;
+    double* _output;
+    double* _setpoint;
 
-    double kP;
-    double kI;
-    double kD;
+    double _kP;
+    double _kI;
+    double _kD;
 
-    int direction;
+    int _direction;
 
-    double upperLimit;
-    double lowerLimit;
+    double _upperLimit;
+    double _lowerLimit;
 
-    int sampleTime;
+    unsigned int _sampleTime;
 
-    double deadbandMin;
-    double deadbandMax;
+    double _deadbandMin;
+    double _deadbandPlus;
+
+    unsigned int _prevMillis;
+    double _prevInput;
+    double _integralPart;
+    double _error;
 };
 
 #endif

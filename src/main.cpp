@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include <PID_v1.h>
 #include "settings.h"
+#include "myPID.h"
 
 // Debug-mode
 #define DEBUG
@@ -18,7 +19,7 @@ Adafruit_MAX31865 panelSensor = Adafruit_MAX31865(PANEL_CS);
 double pidSetpoint = SETPOINT;
 double pidInput = 0;
 double pidOutput = 0;
-PID pumpPID(&pidSetpoint, &pidOutput, &pidInput, kP, kI, kD, DIRECT);
+PID pumpPID(&pidSetpoint, &pidOutput, &pidInput, kP, kI, kD, REVERSE);
 
 //Variables to hold the temperatures
 double tankTemp = 0;
