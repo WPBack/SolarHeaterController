@@ -2,7 +2,6 @@
 #include <SPI.h>
 #include <Adafruit_MAX31865.h>
 #include <Wire.h>
-#include <PID_v1.h>
 #include "settings.h"
 #include "myPID.h"
 
@@ -19,7 +18,7 @@ Adafruit_MAX31865 panelSensor = Adafruit_MAX31865(PANEL_CS);
 double pidSetpoint = SETPOINT;
 double pidInput = 0;
 double pidOutput = 0;
-PID pumpPID(&pidSetpoint, &pidOutput, &pidInput, kP, kI, kD, REVERSE);
+myPID pumpPID(&pidSetpoint, &pidOutput, &pidInput, kP, kI, kD, REVERSE);
 
 //Variables to hold the temperatures
 double tankTemp = 0;
@@ -65,8 +64,9 @@ void setup() {
   Wire.onRequest(sendData);
 
   // Setup the PID
-  pumpPID.SetMode(AUTOMATIC);
-  pumpPID.SetOutputLimits(PWM_MIN, PWM_MAX);
+  pumpPID.setOutputLimits(PWM_MIN, PWM_MAX);
+  pumpPID.setSampleTime(PID_TIME);
+  pumpPID.setDeadBand(PID_DB_MIN, PID_DB_PLUS);
 
   // Setup the pump-pin
   pinMode(PUMP_PIN, OUTPUT);
@@ -81,10 +81,8 @@ void loop() {
     readTemps();
   }
 
-  //compute the PID
-  if (millis() - pidMillis >= PID_TIME) {
-    runPID();
-  }
+  // Runs the PID
+  pumpPID.calculate();
 }
 
 //-------------- Reades the tepmeratures ---------------------------------------
@@ -97,6 +95,9 @@ void readTemps() {
   tankTemp = tankSensor.temperature(NOMREF, RREF);
   panelTemp = tankSensor.temperature(NOMREF, RREF);
 
+  // Calculates the temp difference
+  pidInput = panelTemp - tankTemp;
+
   // Saves the temps in char arrays to send over I2C
   dtostrf(tankTemp, 6, 2, tankI2C);
   dtostrf(panelTemp, 6, 2, panelI2C);
@@ -108,23 +109,6 @@ void readTemps() {
     Serial.print(" Panel: ");
     Serial.println(panelTemp);
   #endif
-}
-
-//-------------- Updates the PID and sets the pump speed -----------------------
-
-void runPID() {
-  // Saves the time
-  pidMillis = millis();
-
-  // Calculates the difference
-  pidInput = panelTemp - tankTemp;
-
-  // Runs the PID
-  pumpPID.Compute();
-
-  // Writes the speed to the pin that controls the pump and saves it for I2C
-  analogWrite(PUMP_PIN, pidOutput*2.55);
-  dtostrf(pidOutput, 6, 2, pumpI2C);
 }
 
 // Writes data to I2C for logging

@@ -2,6 +2,9 @@
 #define kP 5
 #define kI 0.1
 #define kD 0
+#define PID_TIME    1000
+#define PID_DB_MIN  0.5
+#define PID_DB_PLUS 0.5
 
 // General settins
 #define STARTTEMP 5   //Temp to start at
@@ -26,4 +29,3 @@
 // Settings for how often the stuff should run
 #define READ_TEMPS_TIME 5000
 #define STATE_TIME 1000
-#define PID_TIME 1000
