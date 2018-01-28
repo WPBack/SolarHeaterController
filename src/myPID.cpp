@@ -30,12 +30,36 @@ myPID::myPID(double* input, double* output, double* setpoint, double kP, double 
 
 void myPID::calculate() {
   if(millis() - _prevMillis >= _sampleTime) {
+    // Update the time
     _prevMillis = millis();
+
+    // Calculate the error
     if(_direction == NORMAL) {
       _error = *_setpoint - *_input;
+      _inputChange = _prevInput - *_input;
     }
     else {
       _error = *_input - *_setpoint;
+      _inputChange = *_input - _prevInput;
+    }
+
+    // Updates the last input
+    _prevInput = *_input;
+
+    // Update the integral part
+    _integralPart += _error*_kI*_sampleTime;
+
+    // Calculate the output
+    *_output = _error*_kP + _integralPart + _inputChange*_kD/_sampleTime;
+
+    // Checks if the output is outside of the bounds and prevents integral windup
+    if(*_output < _lowerLimit) {
+      *_output = _lowerLimit;
+      _integralPart = *_output - _error*_kP - _inputChange*_kD/_sampleTime;
+    }
+    else if(*_output > _upperLimit) {
+      *_output = _upperLimit;
+      _integralPart = *_output - _error*_kP - _inputChange*_kD/_sampleTime;
     }
   }
 }

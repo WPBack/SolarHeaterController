@@ -41,6 +41,7 @@ class myPID {
     double _prevInput;
     double _integralPart;
     double _error;
+    double _inputChange;
 };
 
 #endif
