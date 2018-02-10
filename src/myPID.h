@@ -39,7 +39,9 @@ class myPID {
 
     unsigned int _prevMillis;
     double _prevInput;
+    double _propPart;
     double _integralPart;
+    double _derivativePart;
     double _error;
     double _inputChange;
 };

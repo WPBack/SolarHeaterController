@@ -25,7 +25,9 @@ myPID::myPID(double* input, double* output, double* setpoint, double kP, double 
 
   _prevMillis = millis();
   _prevInput = *_input;
+  _propPart = 0;
   _integralPart = 0;
+  _derivativePart = 0;
 }
 
 void myPID::calculate() {
@@ -46,11 +48,39 @@ void myPID::calculate() {
     // Updates the last input
     _prevInput = *_input;
 
-    // Update the integral part
-    _integralPart += _error*_kI*_sampleTime;
+    // Update the proportional part to the deadband
+    if(*_input > *_setpoint + _deadbandPlus) {
+      if(_direction == NORMAL) {
+        _propPart = (_error - _deadbandPlus)*_kP;
+      }
+      else {
+        _propPart = (_error + _deadbandPlus)*_kP;
+      }
+    }
+    else if(*_input < *_setpoint - _deadbandMin) {
+      if(_direction == NORMAL) {
+        _propPart = (_error + _deadbandMin)*_kP;
+      }
+      else {
+        _propPart = (_error - _deadbandMin)*_kP;
+      }
+    }
+    else {
+      _propPart = 0;
+    }
+
+    // Update the integral part if outside the deadband
+    if(*_input < *_setpoint - _deadbandMin && *_input > *_setpoint + _deadbandPlus) {
+      _integralPart += _error*_kI*_sampleTime;
+    }
+
+    // Update the derivative part if outside the deadband
+    if(*_input < *_setpoint - _deadbandMin && *_input > *_setpoint + _deadbandPlus) {
+      _derivativePart = _inputChange*_kD/_sampleTime;
+    }
 
     // Calculate the output
-    *_output = _error*_kP + _integralPart + _inputChange*_kD/_sampleTime;
+    *_output = _propPart + _integralPart + _derivativePart;
 
     // Checks if the output is outside of the bounds and prevents integral windup
     if(*_output < _lowerLimit) {
