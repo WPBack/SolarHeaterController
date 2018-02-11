@@ -7,11 +7,12 @@
 #define PID_DB_PLUS 0.5
 
 // General settins
-#define STARTTEMP 5   //Temp to start at
-#define SETPOINT  10  //Wanted temp difference
-#define STOPTEMP  2   //Temp to stop at
-#define PWM_MIN   14  //Minimum pump speed
-#define PWM_MAX   100 //Maximum pump speed
+#define STARTTEMP 5     //Temp to start at
+#define SETPOINT  10    //Wanted temp difference
+#define STOPTEMP  2     //Temp to stop at
+#define PWM_MIN   14    //Minimum pump speed
+#define PWM_MAX   100   //Maximum pump speed
+#define PRIMETIME 5000  //The time to prime (in millisecond)
 
 // Pin-settings
 #define TANK_CS         10  //Tank chip select pin
@@ -27,5 +28,6 @@
 #define SLAVE_ADDRESS 0x04
 
 // Settings for how often the stuff should run
-#define READ_TEMPS_TIME 5000
+#define READ_TEMPS_TIME 1000
 #define STATE_TIME 1000
+#define PUMP_TIME 500
