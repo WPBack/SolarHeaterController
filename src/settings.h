@@ -19,6 +19,7 @@
 #define PANEL_CS        9   //Panel chip select pin
 #define PUMP_PIN        3   //Pump PWM pin
 #define PUMP_ENABLE_PIN 2   //Pin for the pump relay
+#define ONE_WIRE_PIN    4   //Pin for the 1Wire-sensors
 
 // MAX31865 sensor settings
 #define RREF 4300.0
