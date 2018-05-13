@@ -44,13 +44,34 @@ unsigned long pumpMillis = 0;
 unsigned long primeMillis = 0;
 
 // Arrays to hold the data that should be transfered over I2C
-char tankI2C[6];
-char panelI2C[6];
-char pumpI2C[6];
-char temp0I2C[6];
-char temp1I2C[6];
-char temp2I2C[6];
-char temp3I2C[6];
+union {
+    float fval;
+    byte bval[4];
+} tankI2C;
+union {
+    float fval;
+    byte bval[4];
+} panelI2C;
+union {
+    float fval;
+    byte bval[4];
+} pumpI2C;
+union {
+    float fval;
+    byte bval[4];
+} temp0I2C;
+union {
+    float fval;
+    byte bval[4];
+} temp1I2C;
+union {
+    float fval;
+    byte bval[4];
+} temp2I2C;
+union {
+    float fval;
+    byte bval[4];
+} temp3I2C;
 
 // Enum to hold the state
 enum State {
@@ -166,7 +187,7 @@ void readTemps() {
 
     // Read the temps
     tankTemp = tankSensor.temperature(NOMREF, RREF);
-    panelTemp = tankSensor.temperature(NOMREF, RREF);
+    panelTemp = panelSensor.temperature(NOMREF, RREF);
 
     // Reads the onewire temps
     sensors.requestTemperatures();
@@ -179,12 +200,12 @@ void readTemps() {
     pidInput = panelTemp - tankTemp;
 
     // Saves the temps in char arrays to send over I2C
-    dtostrf(tankTemp, 6, 2, tankI2C);
-    dtostrf(panelTemp, 6, 2, panelI2C);
-    dtostrf(extraTemp0, 6, 2, temp0I2C);
-    dtostrf(extraTemp1, 6, 2, temp1I2C);
-    dtostrf(extraTemp2, 6, 2, temp2I2C);
-    dtostrf(extraTemp3, 6, 2, temp3I2C);
+    tankI2C.fval = tankTemp;
+    panelI2C.fval = panelTemp;
+    temp0I2C.fval = extraTemp0;
+    temp1I2C.fval = extraTemp1;
+    temp2I2C.fval = extraTemp2;
+    temp3I2C.fval = extraTemp3;
 
     // Prints to serial if debug is enabled
     #ifdef DEBUG
@@ -224,7 +245,7 @@ void runPump() {
     }
 
     // Save the pump speed for I2C and set the pin
-    dtostrf(pumpSpeed, 6, 2, pumpI2C);
+    pumpI2C.fval = pumpSpeed;
     analogWrite(PUMP_PIN, pumpSpeed*2.55);
 
     // Prints to serial monitor if debug is enabled
@@ -238,13 +259,13 @@ void runPump() {
 
 void sendData() {
     // Write the temperatures to I2C
-    Wire.write(tankI2C);
-    Wire.write(panelI2C);
-    Wire.write(pumpI2C);
-    Wire.write(temp0I2C);
-    Wire.write(temp1I2C);
-    Wire.write(temp2I2C);
-    Wire.write(temp3I2C);
+    Wire.write(tankI2C.bval, 4);
+    Wire.write(panelI2C.bval, 4);
+    Wire.write(pumpI2C.bval, 4);
+    Wire.write(temp0I2C.bval, 4);
+    Wire.write(temp1I2C.bval, 4);
+    Wire.write(temp2I2C.bval, 4);
+    Wire.write(temp3I2C.bval, 4);
 }
 
 //-------------- Receive I2C-data. If it is 1, start the pump ------------------
