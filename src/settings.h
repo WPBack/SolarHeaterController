@@ -30,6 +30,7 @@
 
 // Settings for how often the stuff should run
 #define READ_TEMPS_TIME 1000
+#define READ_EXTRA_TEMPS_TIME 30000
 #define STATE_TIME 1000
 #define PUMP_TIME 500
 #define MIN_COM_TIME 10000
