@@ -42,6 +42,7 @@ unsigned long readTempMillis = 0;
 unsigned long stateMillis = 0;
 unsigned long pumpMillis = 0;
 unsigned long primeMillis = 0;
+unsigned long comMillis = 0;
 
 // Arrays to hold the data that should be transfered over I2C
 union {
@@ -189,23 +190,12 @@ void readTemps() {
     tankTemp = tankSensor.temperature(NOMREF, RREF);
     panelTemp = panelSensor.temperature(NOMREF, RREF);
 
-    // Reads the onewire temps
-    sensors.requestTemperatures();
-    extraTemp0 = sensors.getTempCByIndex(0);
-    extraTemp1 = sensors.getTempCByIndex(1);
-    extraTemp2 = sensors.getTempCByIndex(2);
-    extraTemp3 = sensors.getTempCByIndex(3);
-
     // Calculates the temp difference
     pidInput = panelTemp - tankTemp;
 
     // Saves the temps in char arrays to send over I2C
     tankI2C.fval = tankTemp;
     panelI2C.fval = panelTemp;
-    temp0I2C.fval = extraTemp0;
-    temp1I2C.fval = extraTemp1;
-    temp2I2C.fval = extraTemp2;
-    temp3I2C.fval = extraTemp3;
 
     // Prints to serial if debug is enabled
     #ifdef DEBUG
@@ -213,14 +203,6 @@ void readTemps() {
         Serial.print(tankTemp);
         Serial.print(" Panel: ");
         Serial.print(panelTemp);
-        Serial.print(" Extra0: ");
-        Serial.print(extraTemp0);
-        Serial.print(" Extra1: ");
-        Serial.print(extraTemp2);
-        Serial.print(" Extra2: ");
-        Serial.print(extraTemp2);
-        Serial.print(" Extra3: ");
-        Serial.println(extraTemp3);
     #endif
 }
 
@@ -258,14 +240,39 @@ void runPump() {
 //-------------- Writes data to I2C for logging --------------------------------
 
 void sendData() {
-    // Write the temperatures to I2C
-    Wire.write(tankI2C.bval, 4);
-    Wire.write(panelI2C.bval, 4);
-    Wire.write(pumpI2C.bval, 4);
-    Wire.write(temp0I2C.bval, 4);
-    Wire.write(temp1I2C.bval, 4);
-    Wire.write(temp2I2C.bval, 4);
-    Wire.write(temp3I2C.bval, 4);
+  if (millis() - comMillis >= MIN_COM_TIME) {
+      comMillis = millis();
+      // Reads the onewire temps
+      sensors.requestTemperatures();
+      extraTemp0 = sensors.getTempCByIndex(0);
+      extraTemp1 = sensors.getTempCByIndex(1);
+      extraTemp2 = sensors.getTempCByIndex(2);
+      extraTemp3 = sensors.getTempCByIndex(3);
+      // Converts the temps for I2C
+      temp0I2C.fval = extraTemp0;
+      temp1I2C.fval = extraTemp1;
+      temp2I2C.fval = extraTemp2;
+      temp3I2C.fval = extraTemp3;
+      // Prints to serial if debug is enabled
+      #ifdef DEBUG
+          Serial.print(" Extra0: ");
+          Serial.print(extraTemp0);
+          Serial.print(" Extra1: ");
+          Serial.print(extraTemp2);
+          Serial.print(" Extra2: ");
+          Serial.print(extraTemp2);
+          Serial.print(" Extra3: ");
+          Serial.println(extraTemp3);
+      #endif
+      // Write the temperatures to I2C
+      Wire.write(tankI2C.bval, 4);
+      Wire.write(panelI2C.bval, 4);
+      Wire.write(pumpI2C.bval, 4);
+      Wire.write(temp0I2C.bval, 4);
+      Wire.write(temp1I2C.bval, 4);
+      Wire.write(temp2I2C.bval, 4);
+      Wire.write(temp3I2C.bval, 4);
+  }
 }
 
 //-------------- Receive I2C-data. If it is 1, start the pump ------------------

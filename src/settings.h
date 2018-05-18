@@ -32,3 +32,4 @@
 #define READ_TEMPS_TIME 1000
 #define STATE_TIME 1000
 #define PUMP_TIME 500
+#define MIN_COM_TIME 10000
