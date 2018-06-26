@@ -45,7 +45,7 @@ unsigned long pumpMillis = 0;
 unsigned long primeMillis = 0;
 unsigned long comMillis = 0;
 
-// Arrays to hold the data that should be transfered over I2C
+// Unions to hold the data that should be transfered over I2C
 union {
     float fval;
     byte bval[4];
@@ -209,7 +209,7 @@ void readTemps() {
         Serial.print("Tank: ");
         Serial.print(tankTemp);
         Serial.print(" Panel: ");
-        Serial.print(panelTemp);
+        Serial.println(panelTemp);
     #endif
 }
 
