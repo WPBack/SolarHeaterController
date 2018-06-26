@@ -119,6 +119,7 @@ void setup() {
 
     // Setup the pump-pin
     pinMode(PUMP_PIN, OUTPUT);
+    pinMode(PUMP_ENABLE_PIN, OUTPUT);
 
     // Setup the onewire-sensors
     sensors.begin();
