@@ -7,12 +7,13 @@
 #define PID_DB_PLUS 0.5
 
 // General settins
-#define STARTTEMP 5     //Temp to start at
-#define SETPOINT  10    //Wanted temp difference
-#define STOPTEMP  2     //Temp to stop at
-#define PWM_MIN   14    //Minimum pump speed
-#define PWM_MAX   100   //Maximum pump speed
-#define PRIMETIME 5000  //The time to prime (in millisecond)
+#define STARTTEMP     5     //Temp to start at
+#define SETPOINT      10    //Wanted temp difference
+#define STOPTEMP      2     //Temp to stop at
+#define PWM_MIN       14    //Minimum pump speed
+#define PWM_MAX       100   //Maximum pump speed
+#define PRIMETIME     5000  //The time to prime (in millisecond)
+#define STARTUP_DELAY 60000 //Delay to start after a reset, to notice restarts
 
 // Pin-settings
 #define TANK_CS         10  //Tank chip select pin
@@ -32,5 +33,5 @@
 #define READ_TEMPS_TIME 1000
 #define READ_EXTRA_TEMPS_TIME 30000
 #define STATE_TIME 1000
-#define PUMP_TIME 500
+#define PUMP_TIME 500 // Bot more than 8000 for the watchdog!!!
 #define MIN_COM_TIME 10000

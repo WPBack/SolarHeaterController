@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <avr/wdt.h>
 #include "settings.h"
 #include "myPID.h"
 
@@ -121,6 +122,12 @@ void setup() {
 
     // Setup the onewire-sensors
     sensors.begin();
+
+    // Startup delay to notice restarts
+    delay(STARTUP_DELAY);
+
+    // Setup the watchdog
+    wdt_enable(WDTO_8S);
 }
 
 //-------------- Main loop -----------------------------------------------------
@@ -145,7 +152,7 @@ void loop() {
     // Runs the PID
     pumpPID.calculate();
 
-    // Sets the pump speed depending on the state
+    // Sets the pump speed depending on the state and resets the watchdog
     if (millis() - pumpMillis >= PUMP_TIME) {
         runPump();
     }
@@ -266,6 +273,9 @@ void runPump() {
     // Save the pump speed for I2C and set the pin
     pumpI2C.fval = pumpSpeed;
     analogWrite(PUMP_PIN, pumpSpeed*2.55);
+
+    // Resets the watchdog
+    wdt_reset();
 
     // Prints to serial monitor if debug is enabled
     #ifdef DEBUG
