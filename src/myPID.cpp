@@ -48,34 +48,18 @@ void myPID::calculate() {
     // Updates the last input
     _prevInput = *_input;
 
-    // Update the proportional part to the deadband
-    if(*_input > *_setpoint + _deadbandPlus) {
-      if(_direction == NORMAL) {
-        _propPart = (_error - _deadbandPlus)*_kP;
-      }
-      else {
-        _propPart = (_error + _deadbandPlus)*_kP;
-      }
-    }
-    else if(*_input < *_setpoint - _deadbandMin) {
-      if(_direction == NORMAL) {
-        _propPart = (_error + _deadbandMin)*_kP;
-      }
-      else {
-        _propPart = (_error - _deadbandMin)*_kP;
-      }
-    }
-    else {
-      _propPart = 0;
+    // Update the proportional part
+    if(*_input < *_setpoint - _deadbandMin || *_input > *_setpoint + _deadbandPlus) {
+      _propPart = _error*_kP;
     }
 
     // Update the integral part if outside the deadband
-    if(*_input < *_setpoint - _deadbandMin && *_input > *_setpoint + _deadbandPlus) {
+    if(*_input < *_setpoint - _deadbandMin || *_input > *_setpoint + _deadbandPlus) {
       _integralPart += _error*_kI*_sampleTime;
     }
 
     // Update the derivative part if outside the deadband
-    if(*_input < *_setpoint - _deadbandMin && *_input > *_setpoint + _deadbandPlus) {
+    if(*_input < *_setpoint - _deadbandMin || *_input > *_setpoint + _deadbandPlus) {
       _derivativePart = _inputChange*_kD/_sampleTime;
     }
 
