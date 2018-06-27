@@ -55,12 +55,12 @@ void myPID::calculate() {
 
     // Update the integral part if outside the deadband
     if(*_input < *_setpoint - _deadbandMin || *_input > *_setpoint + _deadbandPlus) {
-      _integralPart += _error*_kI*_sampleTime;
+      _integralPart += _error*_kI*_sampleTime/1000.0;
     }
 
     // Update the derivative part if outside the deadband
     if(*_input < *_setpoint - _deadbandMin || *_input > *_setpoint + _deadbandPlus) {
-      _derivativePart = _inputChange*_kD/_sampleTime;
+      _derivativePart = _inputChange*_kD/(_sampleTime/1000.0);
     }
 
     // Calculate the output
@@ -69,11 +69,11 @@ void myPID::calculate() {
     // Checks if the output is outside of the bounds and prevents integral windup
     if(*_output < _lowerLimit) {
       *_output = _lowerLimit;
-      _integralPart = *_output - _error*_kP - _inputChange*_kD/_sampleTime;
+      _integralPart = *_output - _error*_kP - _inputChange*_kD/(_sampleTime/1000.0);
     }
     else if(*_output > _upperLimit) {
       *_output = _upperLimit;
-      _integralPart = *_output - _error*_kP - _inputChange*_kD/_sampleTime;
+      _integralPart = *_output - _error*_kP - _inputChange*_kD/(_sampleTime/1000.0);
     }
   }
 }
