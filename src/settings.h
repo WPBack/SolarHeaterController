@@ -1,6 +1,6 @@
 // Tuning parameters for the PID-controller
-#define kP 10
-#define kI 0.000
+#define kP 15
+#define kI 0.00001
 #define kD 0
 #define PID_TIME    1000
 #define PID_DB_MIN  0.5
