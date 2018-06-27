@@ -21,7 +21,7 @@ Adafruit_MAX31865 panelSensor = Adafruit_MAX31865(PANEL_CS);
 double pidSetpoint = SETPOINT;
 double pidInput = 0;
 double pidOutput = 0;
-myPID pumpPID(&pidSetpoint, &pidOutput, &pidInput, kP, kI, kD, NORMAL);
+myPID pumpPID(&pidInput, &pidOutput, &pidSetpoint, kP, kI, kD, REVERSE);
 
 // OneWire-sensors
 OneWire oneWire(ONE_WIRE_PIN);
