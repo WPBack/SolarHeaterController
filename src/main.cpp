@@ -267,7 +267,15 @@ void runPump() {
         digitalWrite(PUMP_ENABLE_PIN, true);
     }
     else {
-        pumpSpeed = pidOutput;
+        if (pidOutput < PWM_MIN + JITTER_THRESHOLD) {
+          pumpSpeed = PWM_MIN;
+        }
+        else if (pidOutput > PWM_MAX - JITTER_THRESHOLD) {
+          pumpSpeed = PWM_MAX;
+        }
+        else {
+          pumpSpeed = pidOutput;
+        }
         digitalWrite(PUMP_ENABLE_PIN, true);
     }
 
