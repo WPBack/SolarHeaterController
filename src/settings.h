@@ -1,5 +1,5 @@
 // Tuning parameters for the PID-controller
-#define kP 5
+#define kP 2.5
 #define kI 0.00001
 #define kD 0
 #define PID_TIME    1000
@@ -7,7 +7,7 @@
 #define PID_DB_PLUS 0.5
 
 // General settins
-#define STARTTEMP         5     //Temp to start at
+#define STARTTEMP         3     //Temp to start at
 #define SETPOINT          10    //Wanted temp difference
 #define STOPTEMP          2     //Temp to stop at
 #define PWM_MIN           14    //Minimum pump speed
