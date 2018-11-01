@@ -4,6 +4,7 @@
 #include <Wire.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
+#include <avr/wdt.h>
 #include "settings.h"
 #include "myPID.h"
 
@@ -20,7 +21,7 @@ Adafruit_MAX31865 panelSensor = Adafruit_MAX31865(PANEL_CS);
 double pidSetpoint = SETPOINT;
 double pidInput = 0;
 double pidOutput = 0;
-myPID pumpPID(&pidSetpoint, &pidOutput, &pidInput, kP, kI, kD, REVERSE);
+myPID pumpPID(&pidInput, &pidOutput, &pidSetpoint, kP, kI, kD, REVERSE);
 
 // OneWire-sensors
 OneWire oneWire(ONE_WIRE_PIN);
@@ -45,10 +46,14 @@ unsigned long pumpMillis = 0;
 unsigned long primeMillis = 0;
 unsigned long comMillis = 0;
 
+<<<<<<< HEAD
 // Variables for the temperature sanity checks
 int sanity_numbers = 0;
 
 // Arrays to hold the data that should be transfered over I2C
+=======
+// Unions to hold the data that should be transfered over I2C
+>>>>>>> 11af043c4b42b44a5471ee701b76e3cfe7c94a80
 union {
     float fval;
     byte bval[4];
@@ -121,9 +126,16 @@ void setup() {
 
     // Setup the pump-pin
     pinMode(PUMP_PIN, OUTPUT);
+    pinMode(PUMP_ENABLE_PIN, OUTPUT);
 
     // Setup the onewire-sensors
     sensors.begin();
+
+    // Startup delay to notice restarts
+    delay(STARTUP_DELAY);
+
+    // Setup the watchdog
+    wdt_enable(WDTO_8S);
 }
 
 //-------------- Main loop -----------------------------------------------------
@@ -148,7 +160,7 @@ void loop() {
     // Runs the PID
     pumpPID.calculate();
 
-    // Sets the pump speed depending on the state
+    // Sets the pump speed depending on the state and resets the watchdog
     if (millis() - pumpMillis >= PUMP_TIME) {
         runPump();
     }
@@ -226,7 +238,7 @@ void readTemps() {
         Serial.print("Tank: ");
         Serial.print(tankTemp);
         Serial.print(" Panel: ");
-        Serial.print(panelTemp);
+        Serial.println(panelTemp);
     #endif
 }
 
@@ -276,13 +288,24 @@ void runPump() {
         digitalWrite(PUMP_ENABLE_PIN, true);
     }
     else {
-        pumpSpeed = pidOutput;
+        if (pidOutput < PWM_MIN + JITTER_THRESHOLD) {
+          pumpSpeed = PWM_MIN;
+        }
+        else if (pidOutput > PWM_MAX - JITTER_THRESHOLD) {
+          pumpSpeed = PWM_MAX;
+        }
+        else {
+          pumpSpeed = pidOutput;
+        }
         digitalWrite(PUMP_ENABLE_PIN, true);
     }
 
     // Save the pump speed for I2C and set the pin
     pumpI2C.fval = pumpSpeed;
     analogWrite(PUMP_PIN, pumpSpeed*2.55);
+
+    // Resets the watchdog
+    wdt_reset();
 
     // Prints to serial monitor if debug is enabled
     #ifdef DEBUG
