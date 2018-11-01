@@ -37,13 +37,16 @@ double extraTemp3 = 0;
 // Variable to hold the pump speed
 double pumpSpeed = 0;
 
-//Variable to hold the last time it was doing something
+// Variable to hold the last time it was doing something
 unsigned long readTempMillis = 0;
 unsigned long readExtraTempMillis = 0;
 unsigned long stateMillis = 0;
 unsigned long pumpMillis = 0;
 unsigned long primeMillis = 0;
 unsigned long comMillis = 0;
+
+// Variables for the temperature sanity checks
+int sanity_numbers = 0;
 
 // Arrays to hold the data that should be transfered over I2C
 union {
@@ -203,6 +206,20 @@ void readTemps() {
     // Saves the temps in char arrays to send over I2C
     tankI2C.fval = tankTemp;
     panelI2C.fval = panelTemp;
+
+    // Sanity-check for the temperatures
+    if (tankTemp < MIN_TEMP || tankTemp > MAX_TEMP ||
+        panelTemp< MIN_TEMP || panelTemp> MAX_TEMP) {
+          sanity_numbers++;
+    }
+    else {
+      sanity_numbers = 0;
+    }
+
+    // If the temps has been invalid for too long, let the watchdog reset
+    if (sanity_numbers >= SANITY_NUMBER) {
+      while(true);
+    }
 
     // Prints to serial if debug is enabled
     #ifdef DEBUG

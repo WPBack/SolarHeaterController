@@ -22,15 +22,20 @@
 #define ONE_WIRE_PIN    4   //Pin for the 1Wire-sensors
 
 // MAX31865 sensor settings
-#define RREF 4300.0
-#define NOMREF 1000
+#define RREF    4300.0
+#define NOMREF  1000
 
 // I2C settings
 #define SLAVE_ADDRESS 0x04
 
 // Settings for how often the stuff should run
-#define READ_TEMPS_TIME 1000
+#define READ_TEMPS_TIME        1000
 #define READ_EXTRA_TEMPS_TIME 30000
-#define STATE_TIME 1000
-#define PUMP_TIME 500
-#define MIN_COM_TIME 10000
+#define STATE_TIME             1000
+#define PUMP_TIME               500
+#define MIN_COM_TIME          10000
+
+// Settings for temperature sanity checks
+#define MAX_TEMP      160 //Maximum normal temp for panel and tank
+#define MIN_TEMP      -50 //Minimum normal temp for panel and tank
+#define SANITY_NUMBER 30  //How many invalid readings in a row that is needed
