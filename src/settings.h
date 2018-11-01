@@ -33,17 +33,11 @@
 // Settings for how often the stuff should run
 #define READ_TEMPS_TIME        1000
 #define READ_EXTRA_TEMPS_TIME 30000
-<<<<<<< HEAD
 #define STATE_TIME             1000
-#define PUMP_TIME               500
+#define PUMP_TIME               500 //Not more than 8000 for whatchdog!
 #define MIN_COM_TIME          10000
 
 // Settings for temperature sanity checks
 #define MAX_TEMP      160 //Maximum normal temp for panel and tank
 #define MIN_TEMP      -50 //Minimum normal temp for panel and tank
 #define SANITY_NUMBER 30  //How many invalid readings in a row that is needed
-=======
-#define STATE_TIME 1000
-#define PUMP_TIME 500 // Bot more than 8000 for the watchdog!!!
-#define MIN_COM_TIME 10000
->>>>>>> 11af043c4b42b44a5471ee701b76e3cfe7c94a80

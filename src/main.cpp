@@ -46,14 +46,10 @@ unsigned long pumpMillis = 0;
 unsigned long primeMillis = 0;
 unsigned long comMillis = 0;
 
-<<<<<<< HEAD
 // Variables for the temperature sanity checks
 int sanity_numbers = 0;
 
-// Arrays to hold the data that should be transfered over I2C
-=======
 // Unions to hold the data that should be transfered over I2C
->>>>>>> 11af043c4b42b44a5471ee701b76e3cfe7c94a80
 union {
     float fval;
     byte bval[4];
