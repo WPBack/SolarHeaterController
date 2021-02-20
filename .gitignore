@@ -4,3 +4,6 @@
 .gcc-flags.json
 .travis.yml
 lib
+ESPDataLogger/settings_private.h
+.pio
+.vscode
